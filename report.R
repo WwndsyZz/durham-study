@@ -36,7 +36,7 @@ if(any(data$Experience < 0)){
 }
 
 set.seed(123) 
-trainIndex <- createDataPartition(data$Personal.Loan, p=0.7, list=FALSE)  # 70%训练, 30%测试
+trainIndex <- createDataPartition(data$Personal.Loan, p=0.7, list=FALSE) 
 trainData <- data[trainIndex, ]
 testData  <- data[-trainIndex, ]
 dim(trainData); dim(testData)
@@ -125,7 +125,15 @@ logProb  <- predict(logModel, testData, type="prob")[,"Yes"]
 treeProb <- predict(treeModel, testData, type="prob")[,"Yes"]
 rfProb   <- predict(rfModel, testData, type="prob")[,"Yes"]
 xgbProb  <- predict(xgbModel, testData, type="prob")[,"Yes"]
+logROC  <- roc(response=testData$Personal.Loan, predictor=logProb, levels=c("No","Yes"))
+treeROC <- roc(testData$Personal.Loan, treeProb, levels=c("No","Yes"))
+rfROC   <- roc(testData$Personal.Loan, rfProb, levels=c("No","Yes"))
+xgbROC  <- roc(testData$Personal.Loan, xgbProb, levels=c("No","Yes"))
 
+logAUC  <- as.numeric(logROC$auc)
+treeAUC <- as.numeric(treeROC$auc)
+rfAUC   <- as.numeric(rfROC$auc)
+xgbAUC  <- as.numeric(xgbROC$auc)
 plot(logROC, col="blue", lwd=2, main="ROC Curves on Test Data")
 lines(treeROC, col="green", lwd=2)
 lines(rfROC, col="orange", lwd=2)
